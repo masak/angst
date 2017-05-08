@@ -67,4 +67,12 @@ describe("Parsing a HTML template", () => {
             { message: "Got </p> without <p>", fileName: "x.html", line: 2, column: 3 },
         ]);
     });
+
+    it("accepts a directive", () => {
+        let content = deindent(`
+            <!DOCTYPE html>
+        `);
+
+        assert.deepEqual(parseTemplate(content, "x.html"), []);
+    });
 });
