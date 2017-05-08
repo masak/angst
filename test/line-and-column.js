@@ -13,9 +13,9 @@ describe("Line and column position", () => {
             line 3
         `);
 
-        assert.equal(lineAndColumn(content, 0), "line 1, column 1");
-        assert.equal(lineAndColumn(content, 4), "line 1, column 5");
-        assert.equal(lineAndColumn(content, 6), "line 2, column 1");
-        assert.equal(lineAndColumn(content, 15), "line 3, column 3");
+        assert.deepEqual(lineAndColumn(content, 0), [1, 1]);
+        assert.deepEqual(lineAndColumn(content, 4), [1, 5]);
+        assert.deepEqual(lineAndColumn(content, 6), [2, 1]);
+        assert.deepEqual(lineAndColumn(content, 15), [3, 3]);
     });
 });

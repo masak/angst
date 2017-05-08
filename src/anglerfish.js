@@ -7,7 +7,7 @@ export function lineAndColumn(content, index) {
         ? prefix.length
         : prefix.length - indexOfLastNewline;
 
-    return `line ${line}, column ${column}`;
+    return [line, column];
 }
 
 export function parseTemplate(content, fileName) {
