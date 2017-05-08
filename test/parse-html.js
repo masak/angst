@@ -55,4 +55,16 @@ describe("Parsing a HTML template", () => {
             { message: "Got </div> without <div>", fileName: "x.html", line: 1, column: 1 },
         ]);
     });
+
+    it("rejects a closing tag without an opening tag, redux", () => {
+        let content = deindent(`
+            <div>
+              </p>
+        `);
+
+        assert.deepEqual(parseTemplate(content, "x.html"), [
+            { message: "Got </p> before the expected </div>", fileName: "x.html", line: 2, column: 3 },
+            { message: "Got </p> without <p>", fileName: "x.html", line: 2, column: 3 },
+        ]);
+    });
 });

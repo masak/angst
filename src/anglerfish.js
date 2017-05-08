@@ -45,7 +45,12 @@ export function parseTemplate(content, fileName) {
                 let expectedTagName = tagStack.pop();
                 while (tagName !== expectedTagName) {
                     registerError(`Got </${tagName}> before the expected </${expectedTagName}>`);
-                    expectedTagName = tagStack.pop();
+                    if (!tagStack.length) {
+                        registerError(`Got </${tagName}> without <${tagName}>`);
+                        break;
+                    } else {
+                        expectedTagName = tagStack.pop();
+                    }
                 }
             }
             pos += length;
