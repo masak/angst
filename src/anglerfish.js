@@ -22,18 +22,15 @@ export function parseTemplate(content, fileName) {
     }
 
     while (pos < content.length) {
-        let spaceCount = content.substring(pos).match(/^\s*/)[0].length;
-        pos += spaceCount;
-
-        if (pos >= content.length) {
-            break;
-        }
-
         let suffix = content.substring(pos);
-        let openingTagMatch = suffix.match(/<(\w+)>/);
-        let closingTagMatch = suffix.match(/<\/(\w+)>/);
+        let whitespaceMatch = suffix.match(/^\s+/);
+        let openingTagMatch = suffix.match(/^<(\w+)>/);
+        let closingTagMatch = suffix.match(/^<\/(\w+)>/);
 
-        if (openingTagMatch) {
+        if (whitespaceMatch) {
+            let [{ length }] = whitespaceMatch;
+            pos += length;
+        } else if (openingTagMatch) {
             let [{ length }, tagName] = openingTagMatch;
             tagStack.push(tagName);
             pos += length;
