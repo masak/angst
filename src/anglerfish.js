@@ -9,3 +9,7 @@ export function lineAndColumn(content, index) {
 
     return `line ${line}, column ${column}`;
 }
+
+export function parseTemplate(content, fileName) {
+    return [];
+}
