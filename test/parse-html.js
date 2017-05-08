@@ -45,4 +45,14 @@ describe("Parsing a HTML template", () => {
             { message: "Got end of template before the expected </div>", fileName: "x.html", line: 2, column: 10 },
         ]);
     });
+
+    it("rejects a closing tag without an opening tag", () => {
+        let content = deindent(`
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, "x.html"), [
+            { message: "Got </div> without <div>", fileName: "x.html", line: 1, column: 1 },
+        ]);
+    });
 });

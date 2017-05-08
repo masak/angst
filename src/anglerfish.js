@@ -39,10 +39,14 @@ export function parseTemplate(content, fileName) {
             pos += length;
         } else if (closingTagMatch) {
             let [{ length }, tagName] = closingTagMatch;
-            let expectedTagName = tagStack.pop();
-            while (tagName !== expectedTagName) {
-                registerError(`Got </${tagName}> before the expected </${expectedTagName}>`);
-                expectedTagName = tagStack.pop();
+            if (!tagStack.length) {
+                registerError(`Got </${tagName}> without <${tagName}>`);
+            } else {
+                let expectedTagName = tagStack.pop();
+                while (tagName !== expectedTagName) {
+                    registerError(`Got </${tagName}> before the expected </${expectedTagName}>`);
+                    expectedTagName = tagStack.pop();
+                }
             }
             pos += length;
         } else {
