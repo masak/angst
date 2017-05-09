@@ -56,7 +56,11 @@ export function parseTemplate(content, fileName) {
             }
             pos += length;
         } else {
-            throw new Error(`Don't know how to handle "${suffix}"`);
+            let unknown = suffix.substring(0, 15).replace(/\n/g, "\\n").replace(/\r/g, "\\r");
+            let [line, column] = lineAndColumn(content, pos);
+            let message = `Unknown thing "${unknown}"` + "\n" +
+                `Don't know how to proceed at line ${line}, column ${column} of file ${fileName}`;
+            throw new Error(message);
         }
     }
 
