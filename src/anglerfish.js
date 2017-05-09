@@ -16,9 +16,11 @@ export function parseTemplate(content, fileName) {
     let pos = 0;
     let tagStack = [];
 
-    function registerError(message) {
+    function registerError(message, /* optional */ hint) {
         let [line, column] = lineAndColumn(content, pos);
-        errors.push({ message, fileName, line, column });
+        errors.push(hint
+            ? { message, fileName, line, column, hint }
+            : { message, fileName, line, column });
     }
 
     while (pos < content.length) {
@@ -36,21 +38,23 @@ export function parseTemplate(content, fileName) {
             pos += length;
         } else if (openingTagMatch) {
             let [{ length }, tagName] = openingTagMatch;
-            tagStack.push(tagName);
+            let [line, column] = lineAndColumn(content, pos);
+            tagStack.push({ expectedTagName: tagName, line, column });
             pos += length;
         } else if (closingTagMatch) {
             let [{ length }, tagName] = closingTagMatch;
             if (!tagStack.length) {
                 registerError(`Got </${tagName}> without <${tagName}>`);
             } else {
-                let expectedTagName = tagStack.pop();
+                let { expectedTagName, line, column } = tagStack.pop();
                 while (tagName !== expectedTagName) {
-                    registerError(`Got </${tagName}> before the expected </${expectedTagName}>`);
+                    let hint = `Mismatched opening <${expectedTagName}> at line ${line}, column ${column}`;
+                    registerError(`Got </${tagName}> before the expected </${expectedTagName}>`, hint);
                     if (!tagStack.length) {
                         registerError(`Got </${tagName}> without <${tagName}>`);
                         break;
                     } else {
-                        expectedTagName = tagStack.pop();
+                        ({ expectedTagName, line, column } = tagStack.pop());
                     }
                 }
             }
@@ -65,8 +69,9 @@ export function parseTemplate(content, fileName) {
     }
 
     if (tagStack.length) {
-        let expectedTagName = tagStack.pop();
-        registerError(`Got end of template before the expected </${expectedTagName}>`);
+        let { expectedTagName, line, column } = tagStack.pop();
+        let hint = `Mismatched opening <${expectedTagName}> at line ${line}, column ${column}`;
+        registerError(`Got end of template before the expected </${expectedTagName}>`, hint);
     }
 
     return errors;

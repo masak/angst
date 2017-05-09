@@ -30,9 +30,13 @@ describe("Parsing a HTML template", () => {
             </div>
         `);
 
-        assert.deepEqual(parseTemplate(content, "x.html"), [
-            { message: "Got </div> before the expected </p>", fileName: "x.html", line: 3, column: 1 },
-        ]);
+        assert.deepEqual(parseTemplate(content, "x.html"), [{
+            message: "Got </div> before the expected </p>",
+            hint: "Mismatched opening <p> at line 2, column 3",
+            fileName: "x.html",
+            line: 3,
+            column: 1,
+        }]);
     });
 
     it("rejects a document that doesn't close all its opened elements", () => {
@@ -41,9 +45,13 @@ describe("Parsing a HTML template", () => {
               <p></p>
         `);
 
-        assert.deepEqual(parseTemplate(content, "x.html"), [
-            { message: "Got end of template before the expected </div>", fileName: "x.html", line: 2, column: 10 },
-        ]);
+        assert.deepEqual(parseTemplate(content, "x.html"), [{
+            message: "Got end of template before the expected </div>",
+            hint: "Mismatched opening <div> at line 1, column 1",
+            fileName: "x.html",
+            line: 2,
+            column: 10,
+        }]);
     });
 
     it("rejects a closing tag without an opening tag", () => {
@@ -62,10 +70,18 @@ describe("Parsing a HTML template", () => {
               </p>
         `);
 
-        assert.deepEqual(parseTemplate(content, "x.html"), [
-            { message: "Got </p> before the expected </div>", fileName: "x.html", line: 2, column: 3 },
-            { message: "Got </p> without <p>", fileName: "x.html", line: 2, column: 3 },
-        ]);
+        assert.deepEqual(parseTemplate(content, "x.html"), [{
+            message: "Got </p> before the expected </div>",
+            hint: "Mismatched opening <div> at line 1, column 1",
+            fileName: "x.html",
+            line: 2,
+            column: 3,
+        }, {
+            message: "Got </p> without <p>",
+            fileName: "x.html",
+            line: 2,
+            column: 3,
+        }]);
     });
 
     it("accepts a directive", () => {
