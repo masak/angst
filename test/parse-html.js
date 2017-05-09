@@ -111,4 +111,13 @@ describe("Parsing a HTML template", () => {
             </div>
         `), fileName), []);
     });
+
+    it("accepts the '{' character in text", () => {
+        assert.deepEqual(parseTemplate("this is just a '{' character in some text", fileName), []);
+        assert.deepEqual(parseTemplate(deindent(`
+            <div>
+              So is '{' this.
+            </div>
+        `), fileName), []);
+    });
 });

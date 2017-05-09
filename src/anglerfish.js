@@ -30,7 +30,7 @@ export function parseTemplate(content, fileName) {
         let openingTagMatch = suffix.match(/^<(\w+)>/);
         let closingTagMatch = suffix.match(/^<\/(\w+)>/);
         let commentMatch = suffix.match(/^<!--(?:(?!-->).)*-->/);
-        let textMatch = suffix.match(/^[^<{]+/);
+        let textMatch = suffix.match(/^(?:(?!<)(?!\{\{).)+/);
 
         if (whitespaceMatch) {
             let [{ length }] = whitespaceMatch;
