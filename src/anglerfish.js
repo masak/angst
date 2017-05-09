@@ -30,6 +30,7 @@ export function parseTemplate(content, fileName) {
         let openingTagMatch = suffix.match(/^<(\w+)>/);
         let closingTagMatch = suffix.match(/^<\/(\w+)>/);
         let commentMatch = suffix.match(/^<!--(?:(?!-->).)*-->/);
+        let textMatch = suffix.match(/^[^<{]+/);
 
         if (whitespaceMatch) {
             let [{ length }] = whitespaceMatch;
@@ -62,6 +63,9 @@ export function parseTemplate(content, fileName) {
             pos += length;
         } else if (commentMatch) {
             let [{ length }] = commentMatch;
+            pos += length;
+        } else if (textMatch) {
+            let [{ length }] = textMatch;
             pos += length;
         } else {
             let unknown = suffix.substring(0, 15).replace(/\n/g, "\\n").replace(/\r/g, "\\r");

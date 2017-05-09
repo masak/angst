@@ -100,4 +100,13 @@ describe("Parsing a HTML template", () => {
             </div>
         `), "x.html"), []);
     });
+
+    it("accepts text", () => {
+        assert.deepEqual(parseTemplate("this is just some text", "x.html"), []);
+        assert.deepEqual(parseTemplate(deindent(`
+            <div>
+              So is this.
+            </div>
+        `), "x.html"), []);
+    });
 });
