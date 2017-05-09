@@ -25,19 +25,19 @@ export function parseTemplate(content, fileName) {
 
     while (pos < content.length) {
         let suffix = content.substring(pos);
+
         let whitespaceMatch = suffix.match(/^\s+/);
         let directiveMatch = suffix.match(/^<!\w+\s(?:[^>]*)>/);
-        let openingTagMatch = suffix.match(/^<(\w+)>/);
-        let closingTagMatch = suffix.match(/^<\/(\w+)>/);
         let commentMatch = suffix.match(/^<!--(?:(?!-->).)*-->/);
         let textMatch = suffix.match(/^(?:(?!<)(?!\{\{).)+/);
         let angularExpressionMatch = suffix.match(/^\{\{((?:(?!\}\}).)*)\}\}/);
+        let skipMatch = whitespaceMatch || directiveMatch || commentMatch || textMatch || angularExpressionMatch;
 
-        if (whitespaceMatch) {
-            let [{ length }] = whitespaceMatch;
-            pos += length;
-        } else if (directiveMatch) {
-            let [{ length }] = directiveMatch;
+        let openingTagMatch = suffix.match(/^<(\w+)>/);
+        let closingTagMatch = suffix.match(/^<\/(\w+)>/);
+
+        if (skipMatch) {
+            let [{ length }] = skipMatch;
             pos += length;
         } else if (openingTagMatch) {
             let [{ length }, tagName] = openingTagMatch;
@@ -61,15 +61,6 @@ export function parseTemplate(content, fileName) {
                     }
                 }
             }
-            pos += length;
-        } else if (commentMatch) {
-            let [{ length }] = commentMatch;
-            pos += length;
-        } else if (textMatch) {
-            let [{ length }] = textMatch;
-            pos += length;
-        } else if (angularExpressionMatch) {
-            let [{ length }] = angularExpressionMatch;
             pos += length;
         } else {
             let unknown = suffix.substring(0, 15).replace(/\n/g, "\\n").replace(/\r/g, "\\r");
