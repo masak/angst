@@ -91,4 +91,13 @@ describe("Parsing a HTML template", () => {
 
         assert.deepEqual(parseTemplate(content, "x.html"), []);
     });
+
+    it("accepts a HTML comment", () => {
+        assert.deepEqual(parseTemplate("<!-- foo -->", "x.html"), []);
+        assert.deepEqual(parseTemplate(deindent(`
+            <div>
+              <!-- foo -->
+            </div>
+        `), "x.html"), []);
+    });
 });
