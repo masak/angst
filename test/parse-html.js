@@ -14,13 +14,15 @@ function deindent(string) {
 }
 
 describe("Parsing a HTML template", () => {
+    let fileName = "largely-irrelevant-for-this-test.html";
+
     it("accepts an empty template as input", () => {
-        assert.deepEqual(parseTemplate("", "x.html"), []);
+        assert.deepEqual(parseTemplate("", fileName), []);
     });
 
     it("accepts matching opening and closing tags", () => {
-        assert.deepEqual(parseTemplate("<div></div>", "x.html"), []);
-        assert.deepEqual(parseTemplate("<div><p></p></div>", "x.html"), []);
+        assert.deepEqual(parseTemplate("<div></div>", fileName), []);
+        assert.deepEqual(parseTemplate("<div><p></p></div>", fileName), []);
     });
 
     it("rejects a closing tag when it expected another", () => {
@@ -30,10 +32,10 @@ describe("Parsing a HTML template", () => {
             </div>
         `);
 
-        assert.deepEqual(parseTemplate(content, "x.html"), [{
+        assert.deepEqual(parseTemplate(content, fileName), [{
             message: "Got </div> before the expected </p>",
             hint: "Mismatched opening <p> at line 2, column 3",
-            fileName: "x.html",
+            fileName,
             line: 3,
             column: 1,
         }]);
@@ -45,10 +47,10 @@ describe("Parsing a HTML template", () => {
               <p></p>
         `);
 
-        assert.deepEqual(parseTemplate(content, "x.html"), [{
+        assert.deepEqual(parseTemplate(content, fileName), [{
             message: "Got end of template before the expected </div>",
             hint: "Mismatched opening <div> at line 1, column 1",
-            fileName: "x.html",
+            fileName,
             line: 2,
             column: 10,
         }]);
@@ -59,8 +61,8 @@ describe("Parsing a HTML template", () => {
             </div>
         `);
 
-        assert.deepEqual(parseTemplate(content, "x.html"), [
-            { message: "Got </div> without <div>", fileName: "x.html", line: 1, column: 1 },
+        assert.deepEqual(parseTemplate(content, fileName), [
+            { message: "Got </div> without <div>", fileName, line: 1, column: 1 },
         ]);
     });
 
@@ -70,15 +72,15 @@ describe("Parsing a HTML template", () => {
               </p>
         `);
 
-        assert.deepEqual(parseTemplate(content, "x.html"), [{
+        assert.deepEqual(parseTemplate(content, fileName), [{
             message: "Got </p> before the expected </div>",
             hint: "Mismatched opening <div> at line 1, column 1",
-            fileName: "x.html",
+            fileName,
             line: 2,
             column: 3,
         }, {
             message: "Got </p> without <p>",
-            fileName: "x.html",
+            fileName,
             line: 2,
             column: 3,
         }]);
@@ -89,24 +91,24 @@ describe("Parsing a HTML template", () => {
             <!DOCTYPE html>
         `);
 
-        assert.deepEqual(parseTemplate(content, "x.html"), []);
+        assert.deepEqual(parseTemplate(content, fileName), []);
     });
 
     it("accepts a HTML comment", () => {
-        assert.deepEqual(parseTemplate("<!-- foo -->", "x.html"), []);
+        assert.deepEqual(parseTemplate("<!-- foo -->", fileName), []);
         assert.deepEqual(parseTemplate(deindent(`
             <div>
               <!-- foo -->
             </div>
-        `), "x.html"), []);
+        `), fileName), []);
     });
 
     it("accepts text", () => {
-        assert.deepEqual(parseTemplate("this is just some text", "x.html"), []);
+        assert.deepEqual(parseTemplate("this is just some text", fileName), []);
         assert.deepEqual(parseTemplate(deindent(`
             <div>
               So is this.
             </div>
-        `), "x.html"), []);
+        `), fileName), []);
     });
 });
