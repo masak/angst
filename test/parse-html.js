@@ -147,4 +147,29 @@ describe("Parsing a HTML template", () => {
             <input autofocus>
         `), fileName), []);
     });
+
+    it("complains at duplicate IDs in the same document", () => {
+        assert.deepEqual(parseTemplate(deindent(`
+            <p id="foo">This is fine</p>
+            <p>No ID here</p>
+            <p id="foo">Oops!</p>
+        `), fileName), [{
+            message: "Duplicate ID 'foo'",
+            hint: "First occurrence at line 1, column 4",
+            fileName,
+            line: 3,
+            column: 4,
+        }]);
+        assert.deepEqual(parseTemplate(deindent(`
+            <p  id="foo">This is fine</p>
+            <p>No ID here</p>
+            <p class="bar baz" id="foo">Oops!</p>
+        `), fileName), [{
+            message: "Duplicate ID 'foo'",
+            hint: "First occurrence at line 1, column 5",
+            fileName,
+            line: 3,
+            column: 20,
+        }]);
+    });
 });

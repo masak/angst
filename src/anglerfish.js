@@ -10,28 +10,37 @@ function selfClosing(tagName) {
     return ["br", "hr", "input", "img", "link", "meta"].includes(tagName);
 }
 
-let OPENING_TAG_PATTERN = `
+function rx(text) {
+    return text.replace(/\s*#[^\n]*/g, "").replace(/\s+/g, "");
+}
+
+let ATTRIBUTE = rx(`
+    \\s+ ([\\w\\-]+)    # attribute name
+    (?:                 # attribute value
+        (?: =' ([^']*) ' ) |
+        (?: =" ([^"]*) " )
+    )?
+`);
+
+let OPENING_TAG_PATTERN = rx(`
     ^<
     ([\\w\\-]+)         # tag name
-    (?:                 # attributes (zero or more)
-        \\s+ [\\w\\-]+  # attribute name
-        (?:             # attribute value
-            (?: =" [^"]* " ) |
-            (?: =' [^']* ' )
-        )?
-    )*
+    (
+        (?: ${ATTRIBUTE} )*
+    )
     \\s*
     >
-`.replace(/\s*#[^\n]*/g, "").replace(/\s+/g, "");
+`);
 
 export function parseTemplate(content, fileName) {
     let errors = [];
 
     let pos = 0;
     let tagStack = [];
+    let seenId = {};
 
-    function registerError(message, /* optional */ hint) {
-        let [line, column] = lineAndColumn(content, pos);
+    function registerError(message, hint = "", customPos = pos) {
+        let [line, column] = lineAndColumn(content, customPos);
         errors.push(hint
             ? { message, fileName, line, column, hint }
             : { message, fileName, line, column });
@@ -54,10 +63,31 @@ export function parseTemplate(content, fileName) {
             let [{ length }] = skipMatch;
             pos += length;
         } else if (openingTagMatch) {
-            let [{ length }, tagName] = openingTagMatch;
+            let [{ length }, tagName, attributes] = openingTagMatch;
             let [line, column] = lineAndColumn(content, pos);
             if (!selfClosing(tagName)) {
                 tagStack.push({ expectedTagName: tagName, line, column });
+            }
+            let tagPrefixMatch = suffix.match(/^<[\w\-]+/);
+            let tagPrefixLength = tagPrefixMatch[0].length;
+            let attributeRegExp = new RegExp(ATTRIBUTE, "g");
+            let attributeMatch;
+            while ((attributeMatch = attributeRegExp.exec(attributes))) {
+                let [attribute, attributeName, singleQuote, doubleQuote] = attributeMatch;
+                let attributeValue = singleQuote || doubleQuote || "";
+                let attributeOffset = attributeMatch.index + attribute.match(/^\s*/)[0].length;
+                if (attributeName === "id") {
+                    let id = attributeValue;
+                    let attributePos = pos + tagPrefixLength + attributeOffset;
+                    if (seenId.hasOwnProperty(id)) {
+                        let { line, column } = seenId[id];
+                        let hint = `First occurrence at line ${line}, column ${column}`;
+                        registerError(`Duplicate ID '${id}'`, hint, attributePos);
+                    } else {
+                        let [line, column] = lineAndColumn(content, attributePos);
+                        seenId[id] = { line, column };
+                    }
+                }
             }
             pos += length;
         } else if (closingTagMatch) {
