@@ -120,4 +120,19 @@ describe("Parsing a HTML template", () => {
             </div>
         `), fileName), []);
     });
+
+    it("understands that some tags are self-closing", () => {
+        assert.deepEqual(parseTemplate(deindent(`
+            <head>
+              <meta>
+              <link>
+            </head>
+            <body>
+              <input>
+              <img>
+              <br>
+              <hr>
+            </body>
+        `), fileName), []);
+    });
 });

@@ -6,6 +6,10 @@ export function lineAndColumn(content, index) {
     return [line, column];
 }
 
+function selfClosing(tagName) {
+    return ["br", "hr", "input", "img", "link", "meta"].includes(tagName);
+}
+
 export function parseTemplate(content, fileName) {
     let errors = [];
 
@@ -38,7 +42,9 @@ export function parseTemplate(content, fileName) {
         } else if (openingTagMatch) {
             let [{ length }, tagName] = openingTagMatch;
             let [line, column] = lineAndColumn(content, pos);
-            tagStack.push({ expectedTagName: tagName, line, column });
+            if (!selfClosing(tagName)) {
+                tagStack.push({ expectedTagName: tagName, line, column });
+            }
             pos += length;
         } else if (closingTagMatch) {
             let [{ length }, tagName] = closingTagMatch;
