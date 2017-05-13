@@ -135,4 +135,16 @@ describe("Parsing a HTML template", () => {
             </body>
         `), fileName), []);
     });
+
+    it("understands HTML attributes, with and without a value", () => {
+        assert.deepEqual(parseTemplate(deindent(`
+            <input value="hi there, double quotes">
+        `), fileName), []);
+        assert.deepEqual(parseTemplate(deindent(`
+            <input value='why hello, single quotes'>
+        `), fileName), []);
+        assert.deepEqual(parseTemplate(deindent(`
+            <input autofocus>
+        `), fileName), []);
+    });
 });

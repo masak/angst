@@ -10,6 +10,20 @@ function selfClosing(tagName) {
     return ["br", "hr", "input", "img", "link", "meta"].includes(tagName);
 }
 
+let OPENING_TAG_PATTERN = `
+    ^<
+    ([\\w\\-]+)         # tag name
+    (?:                 # attributes (zero or more)
+        \\s+ [\\w\\-]+  # attribute name
+        (?:             # attribute value
+            (?: =" [^"]* " ) |
+            (?: =' [^']* ' )
+        )?
+    )*
+    \\s*
+    >
+`.replace(/\s*#[^\n]*/g, "").replace(/\s+/g, "");
+
 export function parseTemplate(content, fileName) {
     let errors = [];
 
@@ -33,7 +47,7 @@ export function parseTemplate(content, fileName) {
         let angularExpressionMatch = suffix.match(/^\{\{((?:(?!\}\}).)*)\}\}/);
         let skipMatch = whitespaceMatch || directiveMatch || commentMatch || textMatch || angularExpressionMatch;
 
-        let openingTagMatch = suffix.match(/^<(\w+)>/);
+        let openingTagMatch = suffix.match(new RegExp(OPENING_TAG_PATTERN));
         let closingTagMatch = suffix.match(/^<\/(\w+)>/);
 
         if (skipMatch) {
