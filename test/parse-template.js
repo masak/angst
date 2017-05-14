@@ -24,4 +24,17 @@ describe("Parsing an Angular template", () => {
             </div>
         `), fileName), []);
     });
+
+    it("rejects an attribute value delimited by {{ }} but not quotes", () => {
+        assert.deepEqual(parseTemplate(deindent(`
+            <div>
+              <input value={{x}}>
+            </div>
+        `), fileName), [{
+            message: "Unquoted template expression in attribute value: {{x}}",
+            fileName,
+            line: 2,
+            column: 16,
+        }]);
+    });
 });

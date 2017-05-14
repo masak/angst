@@ -18,7 +18,8 @@ let ATTRIBUTE = rx(`
     \\s+ ([\\w\\-]+)    # attribute name
     (?:                 # attribute value
         (?: =' ([^']*) ' ) |
-        (?: =" ([^"]*) " )
+        (?: =" ([^"]*) " ) |
+        (?: =\\{\\{ ((?:(?!\\}\\}).)*) \\}\\} )
     )?
 `);
 
@@ -73,12 +74,20 @@ export function parseTemplate(content, fileName) {
             let attributeRegExp = new RegExp(ATTRIBUTE, "g");
             let attributeMatch;
             while ((attributeMatch = attributeRegExp.exec(attributes))) {
-                let [attribute, attributeName, singleQuote, doubleQuote] = attributeMatch;
-                let attributeValue = singleQuote || doubleQuote || "";
+                let [attribute, attributeName, singleQuote, doubleQuote, doubleCurly] = attributeMatch;
+                let attributeValue = singleQuote || doubleQuote || doubleCurly || "";
                 let attributeOffset = attributeMatch.index + attribute.match(/^\s*/)[0].length;
+                let attributePos = pos + tagPrefixLength + attributeOffset;
+                if (doubleCurly) {
+                    registerError(
+                        `Unquoted template expression in attribute value: {{${doubleCurly}}}`,
+                        "",
+                        attributePos + attributeName.length + 1
+                    );
+                }
+
                 if (attributeName === "id") {
                     let id = attributeValue;
-                    let attributePos = pos + tagPrefixLength + attributeOffset;
                     if (seenId.hasOwnProperty(id)) {
                         let { line, column } = seenId[id];
                         let hint = `First occurrence at line ${line}, column ${column}`;
