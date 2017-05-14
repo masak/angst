@@ -33,7 +33,16 @@ let OPENING_TAG_PATTERN = rx(`
     >
 `);
 
-export function parseTemplate(content, fileName) {
+export function parseTemplate(content, fileName, options = {}) {
+    let idMentionedInController = {};
+    let idRegExp = /#([\w\-]+)/g;
+
+    let idMatch;
+    while ((idMatch = idRegExp.exec(options.controllerSource))) {
+        let id = idMatch[1];
+        idMentionedInController[id] = true;
+    }
+
     let errors = [];
 
     let pos = 0;
@@ -95,6 +104,9 @@ export function parseTemplate(content, fileName) {
                     } else {
                         let [line, column] = lineAndColumn(content, attributePos);
                         seenId[id] = { line, column };
+                        if (!idMentionedInController[id]) {
+                            registerError(`Unused ID '${id}'`, "", attributePos);
+                        }
                     }
                 }
             }

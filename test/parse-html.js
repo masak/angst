@@ -153,7 +153,7 @@ describe("Parsing a HTML template", () => {
             <p id="foo">This is fine</p>
             <p>No ID here</p>
             <p id="foo">Oops!</p>
-        `), fileName), [{
+        `), fileName, { controllerSource: "#foo" }), [{
             message: "Duplicate ID 'foo'",
             hint: "First occurrence at line 1, column 4",
             fileName,
@@ -164,7 +164,7 @@ describe("Parsing a HTML template", () => {
             <p  id="foo">This is fine</p>
             <p>No ID here</p>
             <p class="bar baz" id="foo">Oops!</p>
-        `), fileName), [{
+        `), fileName, { controllerSource: "#foo" }), [{
             message: "Duplicate ID 'foo'",
             hint: "First occurrence at line 1, column 5",
             fileName,
