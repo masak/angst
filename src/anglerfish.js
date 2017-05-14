@@ -34,13 +34,19 @@ let OPENING_TAG_PATTERN = rx(`
 `);
 
 export function parseTemplate(content, fileName, options = {}) {
-    let idMentionedInController = {};
-    let idRegExp = /#([\w\-]+)/g;
+    let idUsed = {};
 
+    let idRegExp = /#([\w\-]+)/g;
     let idMatch;
     while ((idMatch = idRegExp.exec(options.controllerSource))) {
         let id = idMatch[1];
-        idMentionedInController[id] = true;
+        idUsed[id] = true;
+    }
+
+    let getElementByIdRegExp = /\bgetElementById\(['"]([\w-]+)/g;
+    while ((idMatch = getElementByIdRegExp.exec(options.controllerSource))) {
+        let id = idMatch[1];
+        idUsed[id] = true;
     }
 
     let errors = [];
@@ -48,6 +54,7 @@ export function parseTemplate(content, fileName, options = {}) {
     let pos = 0;
     let tagStack = [];
     let seenId = {};
+    let idCheckQueue = [];
 
     function registerError(message, hint = "", customPos = pos) {
         let [line, column] = lineAndColumn(content, customPos);
@@ -104,10 +111,12 @@ export function parseTemplate(content, fileName, options = {}) {
                     } else {
                         let [line, column] = lineAndColumn(content, attributePos);
                         seenId[id] = { line, column };
-                        if (!idMentionedInController[id]) {
-                            registerError(`Unused ID '${id}'`, "", attributePos);
+                        if (!idUsed[id]) {
+                            idCheckQueue.push({ id, attributePos });
                         }
                     }
+                } else if (tagName === "label" && attributeName === "for") {
+                    idUsed[attributeValue] = true;
                 }
             }
             pos += length;
@@ -142,6 +151,12 @@ export function parseTemplate(content, fileName, options = {}) {
         let { expectedTagName, line, column } = tagStack.pop();
         let hint = `Mismatched opening <${expectedTagName}> at line ${line}, column ${column}`;
         registerError(`Got end of template before the expected </${expectedTagName}>`, hint);
+    }
+
+    for (let { id, attributePos } of idCheckQueue) {
+        if (!idUsed[id]) {
+            registerError(`Unused ID '${id}'`, "", attributePos);
+        }
     }
 
     return errors;

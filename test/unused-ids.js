@@ -20,4 +20,18 @@ describe("Parsing a template hunting for unused IDs", () => {
             column: 6,
         }]);
     });
+
+    it("accepts the ID if it is used by various means", () => {
+        assert.deepEqual(parseTemplate("<div id='blah'></div>", fileName, {
+            controllerSource: `
+                console.log("$('#blah').hide();");
+            `,
+        }), []);
+        assert.deepEqual(parseTemplate("<div id='blah'></div>", fileName, {
+            controllerSource: `
+                console.log("getElementById('blah').value;");
+            `,
+        }), []);
+        assert.deepEqual(parseTemplate("<input id='blah'><label for='blah'>yeah</label>", fileName), []);
+    });
 });
