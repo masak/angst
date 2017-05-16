@@ -14,6 +14,10 @@ function rx(text) {
     return text.replace(/\s*#[^\n]*/g, "").replace(/\s+/g, "");
 }
 
+function removeCaptures(text) {
+    return text.replace(/\((?!\?)/g, "(?:");
+}
+
 let ATTRIBUTE = rx(`
     \\s+ ([\\w\\-]+)    # attribute name
     (?:                 # attribute value
@@ -27,9 +31,10 @@ let OPENING_TAG_PATTERN = rx(`
     ^<
     ([\\w\\-]+)         # tag name
     (
-        (?: ${ATTRIBUTE} )*
+        (?: ${removeCaptures(ATTRIBUTE)} )*
     )
     \\s*
+    (/ \\s*)?
     >
 `);
 
@@ -80,7 +85,7 @@ export function parseTemplate(content, fileName, options = {}) {
             let [{ length }] = skipMatch;
             pos += length;
         } else if (openingTagMatch) {
-            let [{ length }, tagName, attributes] = openingTagMatch;
+            let [{ length }, tagName, attributes, selfClosingSlash] = openingTagMatch;
             let [line, column] = lineAndColumn(content, pos);
             if (!selfClosing(tagName)) {
                 tagStack.push({ expectedTagName: tagName, line, column });
@@ -118,6 +123,15 @@ export function parseTemplate(content, fileName, options = {}) {
                 } else if (tagName === "label" && attributeName === "for") {
                     idUsed[attributeValue] = true;
                 }
+            }
+
+            if (selfClosingSlash) {
+                let selfClosingSlashPos = pos + openingTagMatch[0].lastIndexOf("/");
+                registerError(
+                    `XHTML-wannabe slash at the end of <${tagName}> element tag`,
+                    "See http://stackoverflow.com/questions/3558119/are-non-void-self-closing-tags-valid-in-html5",
+                    selfClosingSlashPos
+                );
             }
             pos += length;
         } else if (closingTagMatch) {

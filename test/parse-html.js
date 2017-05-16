@@ -172,4 +172,25 @@ describe("Parsing a HTML template", () => {
             column: 20,
         }]);
     });
+
+    it("rejects a pseudo-XML slash at the end of opening tags", () => {
+        assert.deepEqual(parseTemplate(deindent(`
+            <head>
+              <meta />
+              <link/>
+            </head>
+        `), fileName), [{
+            message: "XHTML-wannabe slash at the end of <meta> element tag",
+            hint: "See http://stackoverflow.com/questions/3558119/are-non-void-self-closing-tags-valid-in-html5",
+            fileName,
+            line: 2,
+            column: 9,
+        }, {
+            message: "XHTML-wannabe slash at the end of <link> element tag",
+            hint: "See http://stackoverflow.com/questions/3558119/are-non-void-self-closing-tags-valid-in-html5",
+            fileName,
+            line: 3,
+            column: 8,
+        }]);
+    });
 });
