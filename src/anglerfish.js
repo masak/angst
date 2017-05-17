@@ -68,6 +68,17 @@ export function parseTemplate(content, fileName, options = {}) {
             : { message, fileName, line, column });
     }
 
+    function checkNamingConvention(name, customPos) {
+        if (!/^[a-z\d]+(?:\-[a-z\d]+)*$/.test(name)) {
+            let suggestedName = name.replace(/_/g, "-");
+            registerError(
+                `The ID '${name}' does not conform to naming guidelines (all-lowercase, hyphens)`,
+                `Suggest writing it as '${suggestedName}' instead`,
+                customPos
+            );
+        }
+    }
+
     while (pos < content.length) {
         let suffix = content.substring(pos);
 
@@ -119,6 +130,7 @@ export function parseTemplate(content, fileName, options = {}) {
                         if (!idUsed[id]) {
                             idCheckQueue.push({ id, attributePos });
                         }
+                        checkNamingConvention(id, attributePos);
                     }
                 } else if (tagName === "label" && attributeName === "for") {
                     idUsed[attributeValue] = true;
