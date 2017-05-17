@@ -28,4 +28,29 @@ describe("Parsing a template looking for broken naming conventions", () => {
             column: 6,
         }]);
     });
+
+    it("suggests initial letter be lower-case", () => {
+        assert.deepEqual(parseTemplate("<div id='Foo'></div>", fileName, {
+            controllerSource: `
+                console.log("$('#Foo').hide();");
+            `,
+        }), [{
+            message: "The ID 'Foo' does not conform to naming guidelines (all-lowercase, hyphens)",
+            hint: "Suggest writing it as 'foo' instead",
+            fileName,
+            line: 1,
+            column: 6,
+        }]);
+        assert.deepEqual(parseTemplate("<div id='Bar-baz'></div>", fileName, {
+            controllerSource: `
+                console.log("$('#Bar-baz').hide();");
+            `,
+        }), [{
+            message: "The ID 'Bar-baz' does not conform to naming guidelines (all-lowercase, hyphens)",
+            hint: "Suggest writing it as 'bar-baz' instead",
+            fileName,
+            line: 1,
+            column: 6,
+        }]);
+    });
 });
