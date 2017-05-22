@@ -103,6 +103,17 @@ describe("Parsing a HTML template", () => {
         `), fileName), []);
     });
 
+    it("accepts a HTML comment spanning several lines", () => {
+        assert.deepEqual(parseTemplate("<!-- foo -->", fileName), []);
+        assert.deepEqual(parseTemplate(deindent(`
+            <div>
+              <!-- foo
+                (bar) baz
+                that's all, folks! -->
+            </div>
+        `), fileName), []);
+    });
+
     it("accepts text", () => {
         assert.deepEqual(parseTemplate("this is just some text", fileName), []);
         assert.deepEqual(parseTemplate(deindent(`
