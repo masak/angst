@@ -42,16 +42,29 @@ export function parseTemplate(content, fileName, options = {}) {
     let idUsed = {};
 
     let idRegExp = /#([\w\-]+)/g;
-    let idMatch;
-    while ((idMatch = idRegExp.exec(options.controllerSource))) {
-        let id = idMatch[1];
-        idUsed[id] = true;
-    }
-
     let getElementByIdRegExp = /\bgetElementById\(['"]([\w-]+)/g;
-    while ((idMatch = getElementByIdRegExp.exec(options.controllerSource))) {
-        let id = idMatch[1];
-        idUsed[id] = true;
+
+    {
+        let idMatch;
+        while ((idMatch = idRegExp.exec(options.controllerSource))) {
+            let id = idMatch[1];
+            idUsed[id] = true;
+        }
+
+        while ((idMatch = getElementByIdRegExp.exec(options.controllerSource))) {
+            let id = idMatch[1];
+            idUsed[id] = true;
+        }
+
+        while ((idMatch = idRegExp.exec(options.ambientSource))) {
+            let id = idMatch[1];
+            idUsed[id] = true;
+        }
+
+        while ((idMatch = getElementByIdRegExp.exec(options.ambientSource))) {
+            let id = idMatch[1];
+            idUsed[id] = true;
+        }
     }
 
     let errors = [];
