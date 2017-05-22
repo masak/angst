@@ -105,7 +105,10 @@ export function parseTemplate(content, fileName, options = {}) {
 
     function checkNamingConvention(name, customPos) {
         if (!/^[a-z\d]+(?:\-[a-z\d]+)*$/.test(name)) {
-            let suggestedName = name.replace(/_/g, "-").replace(/^[A-Z]/, (letter) => letter.toLowerCase());
+            let suggestedName = name
+                .replace(/_/g, "-")
+                .replace(/^[A-Z]/, (letter) => letter.toLowerCase())
+                .replace(/-[A-Z]/g, (dashLetter) => dashLetter.toLowerCase());
             registerError(
                 `The ID '${name}' does not conform to naming guidelines (all-lowercase, hyphens)`,
                 `Suggest writing it as '${suggestedName}' instead`,
