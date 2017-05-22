@@ -37,4 +37,12 @@ describe("Parsing an Angular template", () => {
             column: 16,
         }]);
     });
+
+    it("understands a custom element (with dashes in it)", () => {
+        assert.deepEqual(parseTemplate(deindent(`
+            <custom-element>
+                Here, have some content
+            </custom-element>
+        `), fileName), []);
+    });
 });

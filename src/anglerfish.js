@@ -90,7 +90,7 @@ export function parseTemplate(content, fileName, options = {}) {
         let skipMatch = whitespaceMatch || directiveMatch || commentMatch || textMatch || angularExpressionMatch;
 
         let openingTagMatch = suffix.match(new RegExp(OPENING_TAG_PATTERN));
-        let closingTagMatch = suffix.match(/^<\/(\w+)>/);
+        let closingTagMatch = suffix.match(/^<\/([\w\-]+)>/);
 
         if (skipMatch) {
             let [{ length }] = skipMatch;
