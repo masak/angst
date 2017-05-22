@@ -174,13 +174,13 @@ describe("Parsing a HTML template", () => {
         assert.deepEqual(parseTemplate(deindent(`
             <p  id="foo">This is fine</p>
             <p>No ID here</p>
-            <p class="bar baz" id="foo">Oops!</p>
+            <p data-lol="just pushing the line out a bit" id="foo">Oops!</p>
         `), fileName, { controllerSource: "#foo" }), [{
             message: "Duplicate ID 'foo'",
             hint: "First occurrence at line 1, column 5",
             fileName,
             line: 3,
-            column: 20,
+            column: 47,
         }]);
     });
 
