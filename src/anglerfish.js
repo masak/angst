@@ -108,7 +108,8 @@ export function parseTemplate(content, fileName, options = {}) {
             let suggestedName = name
                 .replace(/_/g, "-")
                 .replace(/^[A-Z]/, (letter) => letter.toLowerCase())
-                .replace(/-[A-Z]/g, (dashLetter) => dashLetter.toLowerCase());
+                .replace(/-[A-Z]/g, (dashLetter) => dashLetter.toLowerCase())
+                .replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
             registerError(
                 `The ID '${name}' does not conform to naming guidelines (all-lowercase, hyphens)`,
                 `Suggest writing it as '${suggestedName}' instead`,
