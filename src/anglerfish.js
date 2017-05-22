@@ -40,8 +40,6 @@ let OPENING_TAG_PATTERN = rx(`
 
 export function parseTemplate(content, fileName, options = {}) {
     let idUsed = {};
-    let classUsed = {};
-
     let idRegExp = /#([\w\-]+)/g;
     let getElementByIdRegExp = /\bgetElementById\(['"]([\w-]+)/g;
     let byIdRegExp = /\bby\.id\(['"]([\w-]+)/g;
@@ -71,6 +69,22 @@ export function parseTemplate(content, fileName, options = {}) {
         while ((idMatch = byIdRegExp.exec(options.ambientSource))) {
             let id = idMatch[1];
             idUsed[id] = true;
+        }
+    }
+
+    let classUsed = {};
+    let classRegExp = /\.([\w\-]+)/g;
+
+    {
+        let classMatch;
+        while ((classMatch = classRegExp.exec(options.controllerSource))) {
+            let className = classMatch[1];
+            classUsed[className] = true;
+        }
+
+        while ((classMatch = classRegExp.exec(options.ambientSource))) {
+            let className = classMatch[1];
+            classUsed[className] = true;
         }
     }
 

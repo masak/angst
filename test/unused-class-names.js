@@ -20,4 +20,17 @@ describe("Parsing a template hunting for unused class names", () => {
             column: 6,
         }]);
     });
+
+    it("accepts a class name if it's mentioned somewhere else", () => {
+        assert.deepEqual(parseTemplate("<div class='clippety'></div>", fileName, {
+            controllerSource: `
+                console.log("Ok, here it is: .clippety");
+            `,
+        }), []);
+        assert.deepEqual(parseTemplate("<div class='blonk'></div>", fileName, {
+            ambientSource: `
+                console.log("And here: .blonk");
+            `,
+        }), []);
+    });
 });
