@@ -33,4 +33,22 @@ describe("Parsing a template hunting for unused class names", () => {
             `,
         }), []);
     });
+
+    it("understands that the class attribute can contain several classes", () => {
+        assert.deepEqual(parseTemplate("<div class='humpity dumpity hop'></div>", fileName, {
+            controllerSource: `
+                console.log(".dumpity");
+            `,
+        }), [{
+            message: "Unused class 'humpity'",
+            fileName,
+            line: 1,
+            column: 6,
+        }, {
+            message: "Unused class 'hop'",
+            fileName,
+            line: 1,
+            column: 6,
+        }]);
+    });
 });

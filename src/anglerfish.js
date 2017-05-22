@@ -170,12 +170,16 @@ export function parseTemplate(content, fileName, options = {}) {
                 } else if (tagName === "label" && attributeName === "for") {
                     idUsed[attributeValue] = true;
                 } else if (attributeName === "class") {
-                    let className = attributeValue;
-                    if (!seenClass.hasOwnProperty(className)) {
-                        let [line, column] = lineAndColumn(content, attributePos);
-                        seenClass[className] = { line, column };
-                        if (!classUsed[className]) {
-                            registerError(`Unused class '${className}'`, "", attributePos);
+                    let wordRegExp = /(\S+)/g;
+                    let wordMatch;
+                    while ((wordMatch = wordRegExp.exec(attributeValue))) {
+                        let className = wordMatch[1];
+                        if (!seenClass.hasOwnProperty(className)) {
+                            let [line, column] = lineAndColumn(content, attributePos);
+                            seenClass[className] = { line, column };
+                            if (!classUsed[className]) {
+                                registerError(`Unused class '${className}'`, "", attributePos);
+                            }
                         }
                     }
                 }
