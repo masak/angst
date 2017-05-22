@@ -43,5 +43,11 @@ describe("Parsing a template hunting for unused IDs", () => {
                 console.log("getElementById('glurgh').value;");
             `,
         }), []);
+        assert.deepEqual(parseTemplate("<div id='fnaaafl'></div>", fileName, {
+            ambientSource: `
+                // this would happen in a test
+                by.id('fnaaafl');
+            `,
+        }), []);
     });
 });

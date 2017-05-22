@@ -43,6 +43,7 @@ export function parseTemplate(content, fileName, options = {}) {
 
     let idRegExp = /#([\w\-]+)/g;
     let getElementByIdRegExp = /\bgetElementById\(['"]([\w-]+)/g;
+    let byIdRegExp = /\bby\.id\(['"]([\w-]+)/g;
 
     {
         let idMatch;
@@ -62,6 +63,11 @@ export function parseTemplate(content, fileName, options = {}) {
         }
 
         while ((idMatch = getElementByIdRegExp.exec(options.ambientSource))) {
+            let id = idMatch[1];
+            idUsed[id] = true;
+        }
+
+        while ((idMatch = byIdRegExp.exec(options.ambientSource))) {
             let id = idMatch[1];
             idUsed[id] = true;
         }
