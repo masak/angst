@@ -40,6 +40,7 @@ let OPENING_TAG_PATTERN = rx(`
 
 export function parseTemplate(content, fileName, options = {}) {
     let idUsed = {};
+    let classUsed = {};
 
     let idRegExp = /#([\w\-]+)/g;
     let getElementByIdRegExp = /\bgetElementById\(['"]([\w-]+)/g;
@@ -79,6 +80,7 @@ export function parseTemplate(content, fileName, options = {}) {
     let tagStack = [];
     let seenId = {};
     let idCheckQueue = [];
+    let seenClass = {};
 
     function registerError(message, hint = "", customPos = pos) {
         let [line, column] = lineAndColumn(content, customPos);
@@ -153,6 +155,15 @@ export function parseTemplate(content, fileName, options = {}) {
                     }
                 } else if (tagName === "label" && attributeName === "for") {
                     idUsed[attributeValue] = true;
+                } else if (attributeName === "class") {
+                    let className = attributeValue;
+                    if (!seenClass.hasOwnProperty(className)) {
+                        let [line, column] = lineAndColumn(content, attributePos);
+                        seenClass[className] = { line, column };
+                        if (!classUsed[className]) {
+                            registerError(`Unused class '${className}'`, "", attributePos);
+                        }
+                    }
                 }
             }
 
