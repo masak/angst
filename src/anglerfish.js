@@ -103,7 +103,7 @@ export function parseTemplate(content, fileName, options = {}) {
             : { message, fileName, line, column });
     }
 
-    function checkNamingConvention(name, customPos) {
+    function checkNamingConvention(name, thingType, customPos) {
         if (!/^[a-z\d]+(?:\-[a-z\d]+)*$/.test(name)) {
             let suggestedName = name
                 .replace(/_/g, "-")
@@ -111,7 +111,7 @@ export function parseTemplate(content, fileName, options = {}) {
                 .replace(/-[A-Z]/g, (dashLetter) => dashLetter.toLowerCase())
                 .replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
             registerError(
-                `The ID '${name}' does not conform to naming guidelines (all-lowercase, hyphens)`,
+                `The ${thingType} '${name}' does not conform to naming guidelines (all-lowercase, hyphens)`,
                 `Suggest writing it as '${suggestedName}' instead`,
                 customPos
             );
@@ -169,7 +169,7 @@ export function parseTemplate(content, fileName, options = {}) {
                         if (!idUsed[id]) {
                             idCheckQueue.push({ id, attributePos });
                         }
-                        checkNamingConvention(id, attributePos);
+                        checkNamingConvention(id, "ID", attributePos);
                     }
                 } else if (tagName === "label" && attributeName === "for") {
                     idUsed[attributeValue] = true;
@@ -184,6 +184,7 @@ export function parseTemplate(content, fileName, options = {}) {
                             if (!classUsed[className]) {
                                 registerError(`Unused class '${className}'`, "", attributePos);
                             }
+                            checkNamingConvention(className, "class", attributePos);
                         }
                     }
                 }
