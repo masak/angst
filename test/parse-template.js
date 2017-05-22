@@ -25,6 +25,16 @@ describe("Parsing an Angular template", () => {
         `), fileName), []);
     });
 
+    it("accepts a multiline Angular expression", () => {
+        assert.deepEqual(parseTemplate(deindent(`
+            <div>
+              {{ x +
+                    y
+                * z }}
+            </div>
+        `), fileName), []);
+    });
+
     it("rejects an attribute value delimited by {{ }} but not quotes", () => {
         assert.deepEqual(parseTemplate(deindent(`
             <div>

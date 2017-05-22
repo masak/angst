@@ -86,7 +86,7 @@ export function parseTemplate(content, fileName, options = {}) {
         let directiveMatch = suffix.match(/^<!\w+\s(?:[^>]*)>/);
         let commentMatch = suffix.match(/^<!--(?:(?!-->)[\s\S])*-->/);
         let textMatch = suffix.match(/^(?:(?!<)(?!\{\{).)+/);
-        let angularExpressionMatch = suffix.match(/^\{\{((?:(?!\}\}).)*)\}\}/);
+        let angularExpressionMatch = suffix.match(/^\{\{((?:(?!\}\})[\s\S])*)\}\}/);
         let skipMatch = whitespaceMatch || directiveMatch || commentMatch || textMatch || angularExpressionMatch;
 
         let openingTagMatch = suffix.match(new RegExp(OPENING_TAG_PATTERN));
