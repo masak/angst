@@ -169,7 +169,7 @@ export function parseTemplate(content, fileName, options = {}) {
                     }
                 } else if (tagName === "label" && attributeName === "for") {
                     idUsed[attributeValue] = true;
-                } else if (attributeName === "class") {
+                } else if (attributeName === "class" && !attributeValue.match(/\{\{/)) {
                     let wordRegExp = /(\S+)/g;
                     let wordMatch;
                     while ((wordMatch = wordRegExp.exec(attributeValue))) {

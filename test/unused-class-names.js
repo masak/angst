@@ -51,4 +51,17 @@ describe("Parsing a template hunting for unused class names", () => {
             column: 6,
         }]);
     });
+
+    it("ignores class attributes with '{{' in them", () => {
+        assert.deepEqual(parseTemplate("<div class='{{surpriseMollifier}}'></div>", fileName, {
+            controllerSource: `
+                console.log("You look but there is nothing there");
+            `,
+        }), []);
+        assert.deepEqual(parseTemplate("<div class='humpity {{ blip }} hop'></div>", fileName, {
+            controllerSource: `
+                console.log("Nope, I got nothing");
+            `,
+        }), []);
+    });
 });
