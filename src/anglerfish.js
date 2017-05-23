@@ -123,8 +123,9 @@ export function parseTemplate(content, fileName, options = {}) {
 
         let directiveMatch = suffix.match(/^<!\w+\s(?:[^>]*)>/);
         let mismatchedCommentOpenerMatch = suffix.match(/^<!--(?:(?!-->)[\s\S])*$/);
+        let mismatchedCommentCloserMatch = suffix.match(/^-->/);
         let commentMatch = suffix.match(/^<!--(?:(?!-->)[\s\S])*-->/);
-        let textMatch = suffix.match(/^(?:(?!<)(?!\{\{)[\s\S])+/);
+        let textMatch = suffix.match(/^(?:(?!<)(?!\{\{)(?!-->)[\s\S])+/);
         let angularExpressionMatch = suffix.match(/^\{\{((?:(?!\}\})[\s\S])*)\}\}/);
         let skipMatch = directiveMatch || commentMatch || textMatch || angularExpressionMatch;
 
@@ -219,6 +220,9 @@ export function parseTemplate(content, fileName, options = {}) {
             pos += length;
         } else if (mismatchedCommentOpenerMatch) {
             registerError("Mismatched HTML comment opener (`<!--`)");
+            return errors;
+        } else if (mismatchedCommentCloserMatch) {
+            registerError("Mismatched HTML comment closer (`-->`)");
             return errors;
         } else {
             let unknown = suffix.substring(0, 15).replace(/\n/g, "\\n").replace(/\r/g, "\\r");

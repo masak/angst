@@ -30,4 +30,19 @@ describe("Parsing malformed comments", () => {
             column: 3,
         }]);
     });
+
+    it("rejects an HTML comment closer without an opener", () => {
+        let content = deindent(`
+            <div>
+              Well this was random: -->
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), [{
+            message: "Mismatched HTML comment closer (`-->`)",
+            fileName,
+            line: 2,
+            column: 25,
+        }]);
+    });
 });
