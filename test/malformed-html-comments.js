@@ -45,4 +45,19 @@ describe("Parsing malformed comments", () => {
             column: 25,
         }]);
     });
+
+    it("rejects an HTML comment closer accidentally left in a closing tag", () => {
+        let content = deindent(`
+            <div>
+              <p>Text, as if everything is still OK</p-->
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), [{
+            message: "Mismatched HTML comment closer in closing tag ('</p -->')",
+            fileName,
+            line: 2,
+            column: 43,
+        }]);
+    });
 });

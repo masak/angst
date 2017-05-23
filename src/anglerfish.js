@@ -130,7 +130,7 @@ export function parseTemplate(content, fileName, options = {}) {
         let skipMatch = directiveMatch || commentMatch || textMatch || angularExpressionMatch;
 
         let openingTagMatch = suffix.match(new RegExp(OPENING_TAG_PATTERN));
-        let closingTagMatch = suffix.match(/^<\/([\w\-]+)>/);
+        let closingTagMatch = suffix.match(/^<\/(\w+(?:-\w+)*)(--)?>/);
 
         if (skipMatch) {
             let [{ length }] = skipMatch;
@@ -201,8 +201,12 @@ export function parseTemplate(content, fileName, options = {}) {
             }
             pos += length;
         } else if (closingTagMatch) {
-            let [{ length }, tagName] = closingTagMatch;
-            if (!tagStack.length) {
+            let [{ length }, tagName, mismatchedClosingComment] = closingTagMatch;
+            if (mismatchedClosingComment) {
+                let closerPos = pos + length - 3;
+                registerError(`Mismatched HTML comment closer in closing tag ('</${tagName} -->')`, "", closerPos);
+                return errors;
+            } else if (!tagStack.length) {
                 registerError(`Got </${tagName}> without <${tagName}>`);
             } else {
                 let { expectedTagName, line, column } = tagStack.pop();
