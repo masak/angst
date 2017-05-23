@@ -121,12 +121,11 @@ export function parseTemplate(content, fileName, options = {}) {
     while (pos < content.length) {
         let suffix = content.substring(pos);
 
-        let whitespaceMatch = suffix.match(/^\s+/);
         let directiveMatch = suffix.match(/^<!\w+\s(?:[^>]*)>/);
         let commentMatch = suffix.match(/^<!--(?:(?!-->)[\s\S])*-->/);
-        let textMatch = suffix.match(/^(?:(?!<)(?!\{\{).)+/);
+        let textMatch = suffix.match(/^(?:(?!<)(?!\{\{)[\s\S])+/);
         let angularExpressionMatch = suffix.match(/^\{\{((?:(?!\}\})[\s\S])*)\}\}/);
-        let skipMatch = whitespaceMatch || directiveMatch || commentMatch || textMatch || angularExpressionMatch;
+        let skipMatch = directiveMatch || commentMatch || textMatch || angularExpressionMatch;
 
         let openingTagMatch = suffix.match(new RegExp(OPENING_TAG_PATTERN));
         let closingTagMatch = suffix.match(/^<\/([\w\-]+)>/);

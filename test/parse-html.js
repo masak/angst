@@ -121,6 +121,13 @@ describe("Parsing a HTML template", () => {
               So is this.
             </div>
         `), fileName), []);
+        assert.deepEqual(parseTemplate(deindent(`
+            <div>
+              Multiline text
+                is OK
+              too.
+            </div>
+        `), fileName), []);
     });
 
     it("accepts the '{' character in text", () => {
