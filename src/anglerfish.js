@@ -158,15 +158,14 @@ export function parseTemplate(content, fileName, options = {}) {
                 let attributeValue = singleQuote || doubleQuote || doubleCurly || "";
                 let attributeOffset = attributeMatch.index + attribute.match(/^\s*/)[0].length;
                 let attributePos = pos + tagPrefixLength + attributeOffset;
+
                 if (doubleCurly) {
                     registerError(
                         `Unquoted template expression in attribute value: {{${doubleCurly}}}`,
                         "",
                         attributePos + attributeName.length + 1
                     );
-                }
-
-                if (attributeName === "id") {
+                } else if (attributeName === "id") {
                     let id = attributeValue;
                     if (seenId.hasOwnProperty(id)) {
                         let { line, column } = seenId[id];

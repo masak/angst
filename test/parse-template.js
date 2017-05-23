@@ -48,6 +48,20 @@ describe("Parsing an Angular template", () => {
         }]);
     });
 
+
+    it("doesn't report other errors on attribute values delimited by {{ }} by not quotes", () => {
+        assert.deepEqual(parseTemplate(deindent(`
+            <div>
+              <span class={{BLAH_BLIH_BLOH[sick.burn].terribleWizard}}></span>
+            </div>
+        `), fileName), [{
+            message: "Unquoted template expression in attribute value: {{BLAH_BLIH_BLOH[sick.burn].terribleWizard}}",
+            fileName,
+            line: 2,
+            column: 15,
+        }]);
+    });
+
     it("understands a custom element (with dashes in it)", () => {
         assert.deepEqual(parseTemplate(deindent(`
             <custom-element>
