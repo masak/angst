@@ -60,4 +60,19 @@ describe("Parsing malformed comments", () => {
             column: 43,
         }]);
     });
+
+    it("rejects an HTML comment opener inside an HTML comment", () => {
+        let content = deindent(`
+            <div>
+              <!-- Look, a comment opener: <!-- oops, that wasn't good -->
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), [{
+            message: "HTML comment opener (`<!--`) inside HTML comment",
+            fileName,
+            line: 2,
+            column: 32,
+        }]);
+    });
 });
