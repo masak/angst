@@ -18,6 +18,14 @@ function removeCaptures(text) {
     return text.replace(/\((?!\?)/g, "(?:");
 }
 
+function by(prop) {
+    return (a, b) => prop(a) < prop(b)
+        ? -1
+        : prop(a) > prop(b)
+            ? +1
+            : 0;
+}
+
 let ATTRIBUTE = rx(`
     \\s+ ([\\w\\-]+)    # attribute name
     (?:                 # attribute value
@@ -249,5 +257,7 @@ export function parseTemplate(content, fileName, options = {}) {
         }
     }
 
-    return errors;
+    return errors
+        .sort(by((error) => error.column))
+        .sort(by((error) => error.line));
 }
