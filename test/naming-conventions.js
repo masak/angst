@@ -219,4 +219,17 @@ describe("Parsing a template looking for broken naming conventions", () => {
             column: 6,
         }]);
     });
+
+    it("doesn't suggest name change if a thing is used in ambient source", () => {
+        assert.deepEqual(parseTemplate("<div id='gleb_hocht'></div>", fileName, {
+            ambientSource: `
+                console.log("$('#gleb_hocht').hide();");
+            `,
+        }), []);
+        assert.deepEqual(parseTemplate("<div class='bribg_mmuw'></div>", fileName, {
+            ambientSource: `
+                console.log("$('.bribg_mmuw').hide();");
+            `,
+        }), []);
+    });
 });

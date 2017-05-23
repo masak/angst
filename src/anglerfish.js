@@ -46,8 +46,12 @@ let OPENING_TAG_PATTERN = rx(`
     >
 `);
 
+let CONTROLLER = "controller";
+let AMBIENT = "ambient";
+let LABEL = "label";
+
 export function parseTemplate(content, fileName, options = {}) {
-    let idUsed = {};
+    let idUsedBy = {};
     let idRegExp = /#([\w\-]+)/g;
     let getElementByIdRegExp = /\bgetElementById\(['"]([\w-]+)/g;
     let byIdRegExp = /\bby\.id\(['"]([\w-]+)/g;
@@ -56,43 +60,43 @@ export function parseTemplate(content, fileName, options = {}) {
         let idMatch;
         while ((idMatch = idRegExp.exec(options.controllerSource))) {
             let id = idMatch[1];
-            idUsed[id] = true;
+            idUsedBy[id] = CONTROLLER;
         }
 
         while ((idMatch = getElementByIdRegExp.exec(options.controllerSource))) {
             let id = idMatch[1];
-            idUsed[id] = true;
+            idUsedBy[id] = CONTROLLER;
         }
 
         while ((idMatch = idRegExp.exec(options.ambientSource))) {
             let id = idMatch[1];
-            idUsed[id] = true;
+            idUsedBy[id] = AMBIENT;
         }
 
         while ((idMatch = getElementByIdRegExp.exec(options.ambientSource))) {
             let id = idMatch[1];
-            idUsed[id] = true;
+            idUsedBy[id] = AMBIENT;
         }
 
         while ((idMatch = byIdRegExp.exec(options.ambientSource))) {
             let id = idMatch[1];
-            idUsed[id] = true;
+            idUsedBy[id] = AMBIENT;
         }
     }
 
-    let classUsed = {};
+    let classUsedBy = {};
     let classRegExp = /\.([\w\-]+)/g;
 
     {
         let classMatch;
         while ((classMatch = classRegExp.exec(options.controllerSource))) {
             let className = classMatch[1];
-            classUsed[className] = true;
+            classUsedBy[className] = CONTROLLER;
         }
 
         while ((classMatch = classRegExp.exec(options.ambientSource))) {
             let className = classMatch[1];
-            classUsed[className] = true;
+            classUsedBy[className] = AMBIENT;
         }
     }
 
@@ -174,13 +178,15 @@ export function parseTemplate(content, fileName, options = {}) {
                     } else {
                         let [line, column] = lineAndColumn(content, attributePos);
                         seenId[id] = { line, column };
-                        if (!idUsed[id]) {
+                        if (!idUsedBy[id]) {
                             idCheckQueue.push({ id, attributePos });
                         }
-                        checkNamingConvention(id, "ID", attributePos);
+                        if (idUsedBy[id] !== AMBIENT) {
+                            checkNamingConvention(id, "ID", attributePos);
+                        }
                     }
                 } else if (tagName === "label" && attributeName === "for") {
-                    idUsed[attributeValue] = true;
+                    idUsedBy[attributeValue] = LABEL;
                 } else if (attributeName === "class" && !attributeValue.match(/\{\{/)) {
                     let wordRegExp = /(\S+)/g;
                     let wordMatch;
@@ -189,10 +195,12 @@ export function parseTemplate(content, fileName, options = {}) {
                         if (!seenClass.hasOwnProperty(className)) {
                             let [line, column] = lineAndColumn(content, attributePos);
                             seenClass[className] = { line, column };
-                            if (!classUsed[className]) {
+                            if (!classUsedBy[className]) {
                                 registerError(`Unused class '${className}'`, "", attributePos);
                             }
-                            checkNamingConvention(className, "class", attributePos);
+                            if (classUsedBy[className] !== AMBIENT) {
+                                checkNamingConvention(className, "class", attributePos);
+                            }
                         }
                     }
                 }
@@ -251,7 +259,7 @@ export function parseTemplate(content, fileName, options = {}) {
     }
 
     for (let { id, attributePos } of idCheckQueue) {
-        if (!idUsed[id]) {
+        if (!idUsedBy[id]) {
             registerError(`Unused ID '${id}'`, "", attributePos);
         }
     }
