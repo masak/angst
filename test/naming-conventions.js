@@ -1,5 +1,5 @@
 import assert from "assert";
-import { parseTemplate } from "../src/anglerfish";
+import { parseTemplate } from "../src/angst";
 
 describe("Parsing a template looking for broken naming conventions", () => {
     let fileName = "largely-irrelevant-for-this-test.html";

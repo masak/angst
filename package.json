@@ -1,16 +1,16 @@
 {
-  "name": "anglerfish",
+  "name": "angst",
   "version": "0.0.1",
   "description": "Scans and Angular 1.x templates and controllers",
   "repository": {
     "type": "git",
-    "url": "git://github.com/masak/anglerfish"
+    "url": "git://github.com/masak/angst"
   },
-  "main": "src/anglerfish.js",
+  "main": "src/angst.js",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register",
     "lint": "eslint .",
-    "build": "browserify -r -t [ babelify --presets [ es2015 ] ] src/anglerfish.js -o bundle.js"
+    "build": "browserify -r -t [ babelify --presets [ es2015 ] ] src/angst.js -o bundle.js"
   },
   "author": "Carl Mäsak",
   "license": "BSD-3-Clause",

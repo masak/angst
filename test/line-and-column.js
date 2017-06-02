@@ -1,5 +1,5 @@
 import assert from "assert";
-import { lineAndColumn } from "../src/anglerfish";
+import { lineAndColumn } from "../src/angst";
 
 function deindent(string) {
     string = string.replace(/^\n+/, "").replace(/\s+$/, "");
