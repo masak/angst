@@ -150,7 +150,6 @@ export function parseTemplate(content, fileName, options = {}) {
             pos += length;
         } else if (textMatch) {
             let [text] = textMatch;
-            let { length } = text;
             let bareAmpersandRegExp = /\&(?!amp;)/g;
             let bareAmpersandMatch;
             while ((bareAmpersandMatch = bareAmpersandRegExp.exec(text))) {
@@ -160,6 +159,7 @@ export function parseTemplate(content, fileName, options = {}) {
                     pos + bareAmpersandMatch.index
                 );
             }
+            let { length } = text;
             pos += length;
         } else if (openingTagMatch) {
             let [{ length }, tagName, attributes, selfClosingSlash] = openingTagMatch;
@@ -217,6 +217,17 @@ export function parseTemplate(content, fileName, options = {}) {
                             }
                         }
                     }
+                }
+
+                let bareAmpersandRegExp = /\&(?!amp;)/g;
+                let bareAmpersandMatch;
+                while ((bareAmpersandMatch = bareAmpersandRegExp.exec(attributeValue))) {
+                    let attributeValuePos = attributePos + attributeName.length + 2;
+                    registerError(
+                        "Got bare ampersand ('&') in attribute value",
+                        "Need to escape ampersands as '&amp;'",
+                        attributeValuePos + bareAmpersandMatch.index
+                    );
                 }
             }
 

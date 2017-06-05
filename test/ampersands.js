@@ -65,4 +65,52 @@ describe("Parsing HTML with bare ampersands", () => {
             column: 10,
         }]);
     });
+
+    it("flags up a bare ampersand in an attribute", () => {
+        let content = deindent(`
+            <div onclick="1 & 2">
+              Not necessarily great code, but a definitely still valid HTML.
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), [{
+            message: "Got bare ampersand ('&') in attribute value",
+            hint: "Need to escape ampersands as '&amp;'",
+            fileName,
+            line: 1,
+            column: 17,
+        }]);
+    });
+
+    it("does not flag up an ampersand that has already been escaped in an attribute", () => {
+        let content = deindent(`
+            <div onclick="3 &amp; 4">
+              Go on, sue me. Do it. I'm waiting.
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), []);
+    });
+
+    it("reports several bare ampersands if there are many", () => {
+        let content = deindent(`
+            <div onclick="5 & 6; 7 &amp; 8; 9 & 10">
+              I regret nothing. Least of all my 'onclick' attributes.
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), [{
+            message: "Got bare ampersand ('&') in attribute value",
+            hint: "Need to escape ampersands as '&amp;'",
+            fileName,
+            line: 1,
+            column: 17,
+        }, {
+            message: "Got bare ampersand ('&') in attribute value",
+            hint: "Need to escape ampersands as '&amp;'",
+            fileName,
+            line: 1,
+            column: 35,
+        }]);
+    });
 });
