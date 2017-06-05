@@ -140,13 +140,25 @@ export function parseTemplate(content, fileName, options = {}) {
         let commentMatch = suffix.match(/^<!--(?:(?!-->)(?!<!--)[\s\S])*-->/);
         let textMatch = suffix.match(/^(?:(?!<)(?!\{\{)(?!-->)[\s\S])+/);
         let angularExpressionMatch = suffix.match(/^\{\{((?:(?!\}\})[\s\S])*)\}\}/);
-        let skipMatch = directiveMatch || commentMatch || textMatch || angularExpressionMatch;
+        let skipMatch = directiveMatch || commentMatch || angularExpressionMatch;
 
         let openingTagMatch = suffix.match(new RegExp(OPENING_TAG_PATTERN));
         let closingTagMatch = suffix.match(/^<\/(\w+(?:-\w+)*)(--)?>/);
 
         if (skipMatch) {
             let [{ length }] = skipMatch;
+            pos += length;
+        } else if (textMatch) {
+            let [text] = textMatch;
+            let { length } = text;
+            let positionInText = text.indexOf("&");
+            if (positionInText !== -1) {
+                registerError(
+                    "Got bare ampersand ('&') in text",
+                    "Need to escape ampersands as '&amp;'",
+                    pos + positionInText
+                );
+            }
             pos += length;
         } else if (openingTagMatch) {
             let [{ length }, tagName, attributes, selfClosingSlash] = openingTagMatch;
