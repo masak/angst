@@ -130,6 +130,18 @@ export function parseTemplate(content, fileName, options = {}) {
         }
     }
 
+    function detectBareAmpersands(text, contextType, pos) {
+        let bareAmpersandRegExp = /\&(?!amp;)/g;
+        let bareAmpersandMatch;
+        while ((bareAmpersandMatch = bareAmpersandRegExp.exec(text))) {
+            registerError(
+                `Got bare ampersand ('&') in ${contextType}`,
+                "Need to escape ampersands as '&amp;'",
+                pos + bareAmpersandMatch.index
+            );
+        }
+    }
+
     while (pos < content.length) {
         let suffix = content.substring(pos);
 
@@ -150,15 +162,7 @@ export function parseTemplate(content, fileName, options = {}) {
             pos += length;
         } else if (textMatch) {
             let [text] = textMatch;
-            let bareAmpersandRegExp = /\&(?!amp;)/g;
-            let bareAmpersandMatch;
-            while ((bareAmpersandMatch = bareAmpersandRegExp.exec(text))) {
-                registerError(
-                    "Got bare ampersand ('&') in text",
-                    "Need to escape ampersands as '&amp;'",
-                    pos + bareAmpersandMatch.index
-                );
-            }
+            detectBareAmpersands(text, "text", pos);
             let { length } = text;
             pos += length;
         } else if (openingTagMatch) {
@@ -219,16 +223,8 @@ export function parseTemplate(content, fileName, options = {}) {
                     }
                 }
 
-                let bareAmpersandRegExp = /\&(?!amp;)/g;
-                let bareAmpersandMatch;
-                while ((bareAmpersandMatch = bareAmpersandRegExp.exec(attributeValue))) {
-                    let attributeValuePos = attributePos + attributeName.length + 2;
-                    registerError(
-                        "Got bare ampersand ('&') in attribute value",
-                        "Need to escape ampersands as '&amp;'",
-                        attributeValuePos + bareAmpersandMatch.index
-                    );
-                }
+                let attributeValuePos = attributePos + attributeName.length + 2;
+                detectBareAmpersands(attributeValue, "attribute value", attributeValuePos);
             }
 
             if (selfClosingSlash) {
