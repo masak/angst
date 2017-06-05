@@ -151,12 +151,12 @@ export function parseTemplate(content, fileName, options = {}) {
         } else if (textMatch) {
             let [text] = textMatch;
             let { length } = text;
-            let positionInText = text.indexOf("&");
-            if (positionInText !== -1) {
+            let bareAmpersandMatch = text.match(/\&(?!amp;)/);
+            if (bareAmpersandMatch) {
                 registerError(
                     "Got bare ampersand ('&') in text",
                     "Need to escape ampersands as '&amp;'",
-                    pos + positionInText
+                    pos + bareAmpersandMatch.index
                 );
             }
             pos += length;

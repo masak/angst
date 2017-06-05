@@ -31,4 +31,14 @@ describe("Parsing HTML with bare ampersands", () => {
             column: 9,
         }]);
     });
+
+    it("does not flag up an ampersand that has already been escaped", () => {
+        let content = deindent(`
+            <div>
+              Pepsi &amp; Mentos
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), []);
+    });
 });
