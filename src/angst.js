@@ -131,7 +131,7 @@ export function parseTemplate(content, fileName, options = {}) {
     }
 
     function detectBareAmpersands(text, contextType, pos) {
-        let bareAmpersandRegExp = /\&(?!amp;)/g;
+        let bareAmpersandRegExp = /\&(?!\w+;)/g;
         let bareAmpersandMatch;
         while ((bareAmpersandMatch = bareAmpersandRegExp.exec(text))) {
             registerError(

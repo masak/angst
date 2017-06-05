@@ -42,6 +42,16 @@ describe("Parsing HTML with bare ampersands", () => {
         assert.deepEqual(parseTemplate(content, fileName), []);
     });
 
+    it("also considers other entities to be fine, of course", () => {
+        let content = deindent(`
+            <div>
+              Pepsi &nbsp; Mentos
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), []);
+    });
+
     it("reports several bare ampersands if there are many", () => {
         let content = deindent(`
             <div>
