@@ -151,8 +151,9 @@ export function parseTemplate(content, fileName, options = {}) {
         } else if (textMatch) {
             let [text] = textMatch;
             let { length } = text;
-            let bareAmpersandMatch = text.match(/\&(?!amp;)/);
-            if (bareAmpersandMatch) {
+            let bareAmpersandRegExp = /\&(?!amp;)/g;
+            let bareAmpersandMatch;
+            while ((bareAmpersandMatch = bareAmpersandRegExp.exec(text))) {
                 registerError(
                     "Got bare ampersand ('&') in text",
                     "Need to escape ampersands as '&amp;'",

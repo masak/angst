@@ -41,4 +41,28 @@ describe("Parsing HTML with bare ampersands", () => {
 
         assert.deepEqual(parseTemplate(content, fileName), []);
     });
+
+    it("reports several bare ampersands if there are many", () => {
+        let content = deindent(`
+            <div>
+              Mac & Cheese
+              Not this one: &amp; because it is escaped
+              Bonnie & Clyde
+            </div>
+        `);
+
+        assert.deepEqual(parseTemplate(content, fileName), [{
+            message: "Got bare ampersand ('&') in text",
+            hint: "Need to escape ampersands as '&amp;'",
+            fileName,
+            line: 2,
+            column: 7,
+        }, {
+            message: "Got bare ampersand ('&') in text",
+            hint: "Need to escape ampersands as '&amp;'",
+            fileName,
+            line: 4,
+            column: 10,
+        }]);
+    });
 });
