@@ -95,8 +95,5 @@
         "browser": true,
         "mocha": true,
         "commonjs": true
-    },
-    "ecmaFeatures": {
-        "experimentalObjectRestSpread": true
     }
 }
